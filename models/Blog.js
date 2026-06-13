@@ -43,13 +43,19 @@ const blogSchema = new mongoose.Schema(
 
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "users",
       required: true,
     },
 
     views: {
       type: Number,
       default: 0,
+    },
+
+    viewedBy: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "users",
+      default: [],
     },
 
     publishedAt: {

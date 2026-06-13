@@ -7,6 +7,7 @@ import NotFound from "./middleware/notfound.js";
 import errorhandler from "./middleware/error.js";
 import AuthRouter from "./routes/authrotes.js";
 import BlogRouter from "./routes/blogrotes.js";
+import FavriteRouter from "./routes/favriteroutes.js";
 configDotenv()
 connectDB();
 const PORT = process.env.PORT || 5000
@@ -29,6 +30,7 @@ app.use(logger);
 app.use(express.urlencoded({extended: true}))
 app.use("/api/v1", AuthRouter);
 app.use("/api/v1", BlogRouter);
+app.use("/api/v1", FavriteRouter);
 app.use(NotFound);
 app.use(errorhandler);
 app.listen(PORT,()=>{
