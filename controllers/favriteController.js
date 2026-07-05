@@ -23,11 +23,27 @@ const addFavriteBlog = async(req,res,next)=>{
 const getFavriteBlogs = async(req,res,next)=>{
     try {
         const {userId} = req.params;
-        const favriteBlogs = await favriteBlogModel.find({userId}).populate("blogId");
-        res.status(200).json({
-            success:true,
-            data:favriteBlogs
-        })
+        // const favriteBlogs = await favriteBlogModel.find({userId}).populate(["blogId","userId"]);
+        // res.status(200).json({
+        //     success:true,
+        //     data:favriteBlogs
+        // })
+        const favoriteBlogs = await favriteBlogModel
+  .find({ userId })
+  .populate({
+    path: "blogId",
+    populate: {
+      path: "author",
+      select: "firstname lastname email"
+    }
+  });
+
+const blogs = favoriteBlogs.map(item => item.blogId);
+
+return res.status(200).json({
+  success: true,
+  data: blogs
+});
     } catch (error) {
         next(error)
     }

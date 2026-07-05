@@ -75,11 +75,13 @@ const getMe = async(req,res,next)=>{
         res.status(200).json({
             success:true,
             data:{
+                id:user.id,
                 firstname:user.firstname,
                 lastname:user.lastname,
                 role:user.role,
                 email:user.email,
                 isActive:user.isActive
+
             }
         })
 

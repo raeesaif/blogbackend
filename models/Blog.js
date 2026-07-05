@@ -14,12 +14,12 @@ const blogSchema = new mongoose.Schema(
     },
 
     coverImage: {
-      type: String, // Cloudinary URL
+      type: String,
       required: true,
     },
 
     coverImagePublicId: {
-      type: String, // Cloudinary public_id
+      type: String,
     },
 
     category: {
@@ -52,20 +52,37 @@ const blogSchema = new mongoose.Schema(
       default: 0,
     },
 
+    likes: {
+      type: Number,
+      default: 0,
+    },
+
+    wordCount: {
+      type: Number,
+      default: 0,
+    },
+
     viewedBy: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "users",
       default: [],
     },
-
     publishedAt: {
       type: Date,
     },
   },
   {
     timestamps: true,
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true },
   }
 );
+
+blogSchema.virtual("readTime").get(function () {
+  const words = this.content ? this.content.trim().split(/\s+/).length : 0;
+  const minutes = Math.ceil(words / 200);
+  return `${minutes} min read`;
+});
 
 const blogModel = mongoose.model("blogs", blogSchema);
 

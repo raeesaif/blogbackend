@@ -17,13 +17,14 @@ export const blogSchema = z.object({
     { required_error: "Category is required" }
   ),
 
-  coverImage: z
-    .string({ required_error: "Cover image is required" })
-    .url("Cover image must be a valid URL")
-    .optional()
-    .or(z.literal("")),
+coverImage: z.string().optional().or(z.literal("")),
 
   author: z
     .string()
-    .optional()
+    .optional(),
+    status:
+    z.enum(["draft", "published"], {
+      required_error: "Status is required",
+    }),
 });
+
