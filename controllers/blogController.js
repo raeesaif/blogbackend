@@ -66,9 +66,16 @@ const getAllBlogs = async (req, res, next) => {
     const skip = (page - 1) * limit;
     const category = req.query.category;
     const sortBy = req.query.sortBy; // newest | most_liked | shortest_read
+    const search = req.query.search;
 
     const query = { status: "published" };
     if (category) query.category = category;
+    if (search) {
+        query.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { category: { $regex: search, $options: "i" } },
+        ];
+    }
 
     let sortOption = { createdAt: -1 };
     if (sortBy === "most_liked") sortOption = { likes: -1 };
