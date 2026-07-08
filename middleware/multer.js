@@ -44,5 +44,32 @@ const handleUploadError = (req, res, next) => {
   });
 };
 
-export { handleUploadError };
+const uploadSingle = (fieldName = "image") => (req, res, next) => {
+  upload.any()(req, res, (err) => {
+    if (err) {
+      if (err.message === "Only JPG, JPEG, and PNG images are allowed") {
+        return res.status(400).json({
+          success: false,
+          errors: [{ field: fieldName, message: "Only JPG, JPEG, and PNG images are allowed" }]
+        });
+      }
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({
+          success: false,
+          errors: [{ field: fieldName, message: "Image size must be less than 5MB" }]
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        errors: [{ field: fieldName, message: err.message }]
+      });
+    }
+    if (req.files && req.files.length > 0) {
+      req.file = req.files[0];
+    }
+    next();
+  });
+};
+
+export { handleUploadError, uploadSingle };
 export default upload;

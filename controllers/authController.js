@@ -1,6 +1,7 @@
 import userModel from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import cloudinary from "../config/cloudinary.js";
 
 const createUser = async(req,res,next)=>{
     const {firstname,lastname,email,password,role} = req.body;
@@ -80,7 +81,8 @@ const getMe = async(req,res,next)=>{
                 lastname:user.lastname,
                 role:user.role,
                 email:user.email,
-                isActive:user.isActive
+                isActive:user.isActive,
+                profileImage:user.profileImage
 
             }
         })
@@ -91,23 +93,44 @@ const getMe = async(req,res,next)=>{
 }
 
 
-const updateProfile = async(req,res,next)=>{
-    const {firstname,lastname} = req.body;
+    const updateProfile = async(req,res,next)=>{
+        const {firstname,lastname} = req.body;
 
-    try {
-        const updateUser = await userModel.findByIdAndUpdate(
-            req.user.id,
-            {firstname,lastname},
-            {returnDocument:"after"}
-        ).select("-password");
-        res.status(200).json({
-            success:true,
-            data:updateUser
-        })
-    } catch (error) {
-        next(error)
+        try {
+            const user = await userModel.findById(req.user.id);
+
+            const updateData = {
+                firstname,
+                lastname,
+            };
+
+            if (req.file) {
+                if (user.profileImageId) {
+                    await cloudinary.uploader.destroy(user.profileImageId);
+                }
+
+                const result = await cloudinary.uploader.upload(req.file.path, {
+                    folder: "profile-images",
+                });
+
+                updateData.profileImage = result.secure_url;
+                updateData.profileImageId = result.public_id;
+            }
+
+            const updatedUser = await userModel
+                .findByIdAndUpdate(req.user.id, updateData, {
+                    new: true,
+                })
+                .select("-password");
+
+            res.status(200).json({
+                success:true,
+                data:updatedUser
+            })
+        } catch (error) {
+            next(error)
+        }
     }
-}
 
 
 const updatePassword = async(req,res,next)=>{
