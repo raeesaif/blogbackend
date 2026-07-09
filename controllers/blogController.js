@@ -1,6 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 import blogModel from "../models/Blog.js";
 import likeModel from "../models/likeBlog.js";
+import { logActivity } from "./ActivityController.js";
 
 const createBlog = async (req, res, next) => {
     try {
@@ -32,6 +33,7 @@ const createBlog = async (req, res, next) => {
             success: true,
             data: newBlog,
         });
+        await logActivity({ icon: "publish", action: "Blog Created", description: `Blog "${title}" was ${status === "published" ? "published" : "saved as draft"}` });
     } catch (error) {
         next(error);
     }
@@ -55,6 +57,7 @@ const updateBlog = async (req, res, next) => {
         }
         const updatedBlog = await blogModel.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.status(200).json({ success: true, data: updatedBlog });
+        await logActivity({ icon: "edit", action: "Blog Updated", description: `Blog "${updatedBlog.title}" was updated` });
     } catch (error) {
         next(error);
     }
@@ -221,6 +224,7 @@ const deleteBlog = async (req, res, next) => {
         }
 
         await blogModel.findByIdAndDelete(req.params.id);
+        await logActivity({ icon: "delete", action: "Blog Deleted", description: `Blog "${blog.title}" was deleted` });
         res.status(200).json({ success: true, message: "Blog deleted successfully" });
     } catch (error) {
         next(error);

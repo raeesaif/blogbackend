@@ -2,6 +2,7 @@ import userModel from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cloudinary from "../config/cloudinary.js";
+import { logActivity } from "./ActivityController.js";
 
 const createUser = async(req,res,next)=>{
     const {firstname,lastname,email,password,role} = req.body;
@@ -19,6 +20,7 @@ const createUser = async(req,res,next)=>{
             role
         });
         await newUser.save();
+        await logActivity({ icon: "user", action: "New User Registered", description: `${firstname} ${lastname} created an account` });
         res.status(201).json({message:"User created successfully"});
     } catch (error) {
         next(error);
@@ -47,6 +49,7 @@ const login  = async(req,res,next)=>{
             {expiresIn:"7d"}
         )
 
+        await logActivity({ icon: "user", action: "User Logged In", description: `${user.firstname} ${user.lastname} logged in` });
         res.status(200).json({
             success:true,
             accessToken,

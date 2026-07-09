@@ -9,6 +9,7 @@ import AuthRouter from "./routes/authrotes.js";
 import BlogRouter from "./routes/blogrotes.js";
 import FavriteRouter from "./routes/favriteroutes.js";
 import likeRoutes from "./routes/likeroutes.js";
+import activityRouter from "./routes/activityRoutes.js";
 configDotenv()
 connectDB();
 const PORT = process.env.PORT || 5000
@@ -21,7 +22,8 @@ app.use(express.json());
 
 app.use(cors({
     origin:
-        "https://blogify-eight-xi.vercel.app",
+        // "http://localhost:5173",
+         "https://blogify-eight-xi.vercel.app",
         methods: ["GET", "POST", "PATCH", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true
@@ -33,6 +35,7 @@ app.use("/api/v1", AuthRouter);
 app.use("/api/v1", BlogRouter);
 app.use("/api/v1", FavriteRouter);
 app.use("/api/v1/",likeRoutes)
+app.use("/api/v1",activityRouter)
 app.use(NotFound);
 app.use(errorhandler);
 app.listen(PORT,()=>{
