@@ -21,12 +21,10 @@ app.use(express.json());
 
 
 app.use(cors({
-    origin:
-        // "http://localhost:5173",
-         "https://blogify-eight-xi.vercel.app",
-        methods: ["GET", "POST", "PATCH", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true
+    origin: process.env.FRONTEND_URL || "https://blogify-eight-xi.vercel.app",
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
 }))
 
 app.use(logger);
@@ -38,6 +36,11 @@ app.use("/api/v1/",likeRoutes)
 app.use("/api/v1",activityRouter)
 app.use(NotFound);
 app.use(errorhandler);
-app.listen(PORT,()=>{
-    console.log(`Server is running on port ${PORT}`)
-})
+
+if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+export default app;
